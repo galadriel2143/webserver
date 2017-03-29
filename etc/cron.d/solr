@@ -1,0 +1,5 @@
+SHELL=/bin/sh
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+# m h dom mon dow user	command
+  0 0 *   *   *   nobody curl -L http://localhost:8983/solr/dovecot/update?optimize=true
+  * * *   *   *   nobody curl -L http://localhost:8983/solr/dovecot/update?commit=true

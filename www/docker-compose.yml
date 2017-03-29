@@ -1,0 +1,212 @@
+version: '2'
+networks:
+    main:
+    mail_main:
+        external: true
+services:
+    ampache:
+        image: ampache/ampache
+        volumes:
+            - /home/ownclouddata/data/widget/files/music:/media:ro
+            - /home/ampache/config:/var/www/config
+            - /home/ampache/themes:/var/www/themes
+        networks:
+            main:
+                aliases:
+                    - ampache
+        logging:
+            options:
+                max-size: 10m
+    cadvisor:
+        image: google/cadvisor:v0.25.0
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:rw
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+        networks:
+            main:
+                aliases:
+                    - cadvisor
+        logging:
+            options:
+                max-size: 10m
+    lockpush:
+        build:
+            context: /home/widget/lockpush
+        depends_on:
+            - mysql
+        networks:
+            main:
+                aliases:
+                    - lockpush
+        logging:
+            options:
+                max-size: 10m
+    owncloud:
+        build:
+            context: ./owncloud
+        env_file: /home/secrets/owncloud.env
+        volumes:
+            - /home/ownclouddata:/var/www/html
+        depends_on:
+            - mysql
+        networks:
+            main:
+                aliases:
+                    - owncloud
+        logging:
+            options:
+                max-size: 10m
+    memcached:
+        image: memcached
+        env_file: /home/secrets/memcached.env
+        networks:
+            main:
+                aliases:
+                    - memcache
+                    - memcached
+        logging:
+            options:
+                max-size: 10m
+    psql:
+        image: postgres:9.6
+        ports: 
+            - "127.0.0.1:5432:5432"
+        env_file: /home/secrets/psql.env
+        volumes:
+            - /home/psql/data:/var/lib/postgresql/data
+        networks:
+            main:
+                aliases:
+                    - postgres
+                    - psql
+        logging:
+            options:
+                max-size: 10m
+    mysql:
+        image: mysql
+        ports:
+            - "127.0.0.1:3306:3306"
+        env_file: /home/secrets/mysql.env
+        volumes:
+            - /home/mysql/data:/var/lib/mysql
+        networks:
+            main:
+                aliases:
+                    - mysql
+        logging:
+            options:
+                max-size: 10m
+    fpm:
+        build: 
+            context: ./fpm
+        env_file: /home/secrets/fpm.env
+        volumes: 
+            - /home/www:/var/mywww
+        networks:
+            main:
+                aliases:
+                    - fpm
+        logging:
+            options:
+                max-size: 10m
+    agendav:
+        build:
+            context: ./agendav
+        env_file: /home/secrets/agendav.env
+        networks:
+            - main
+        depends_on:
+            - psql
+        networks:
+            main:
+                aliases:
+                    - agendav
+        logging:
+            options:
+                max-size: 10m
+    baikal:
+        build:
+            context: ./baikal
+        env_file: /home/secrets/baikal.env
+        depends_on:
+            - mysql
+        networks:
+            main:
+                aliases:
+                    - baikal
+        logging:
+            options:
+                max-size: 10m
+    baikal_tool:
+        build:
+            context: ./baikal_tool
+        env_file: /home/secrets/baikal.env
+        depends_on:
+            - nginx
+        networks:
+            main:
+                aliases:
+                    - baikal_tool
+        logging:
+            options:
+                max-size: 10m
+    roundcube:
+        build:
+            context: ./roundcube
+        env_file: /home/secrets/roundcube.env
+        depends_on:
+            #- memcached
+            - mysql
+        networks:
+            mail_main:
+                aliases:
+                    - roundcube
+            main:
+                aliases:
+                    - roundcube
+        logging:
+            options:
+                max-size: 10m
+        #extra_hosts:
+        #    - "mail.msgor.com:$localhost"
+    nginx:
+        image: nginx:stable
+        env_file: /home/secrets/nginx.env
+        volumes_from:
+            - owncloud:ro
+            - fpm:ro
+            - baikal:ro
+            - agendav:ro
+            - roundcube:ro
+        volumes:
+            - /var/www/letsencrypt:/var/www/letsencrypt:ro
+            - /home/docker/www/nginx/etc:/etc/nginx:ro
+            - /home/letsencrypt/etc:/etc/letsencrypt:ro
+        ports:
+            - "80:80"
+            - "443:443"
+        networks:
+            main:
+                aliases:
+                    - nginx
+                    - dav.$DOMAIN_NAME
+                    - cal.$DOMAIN_NAME
+                    - cloud.$DOMAIN_NAME
+        logging:
+            options:
+                max-size: 10m
+    #oldpsql:
+    #    image: postgres:9.1
+    #    volumes: 
+    #        - /home/widget/oldpsql:/var/lib/postgresql/data
+    #    ports:
+    #        - "127.0.0.1:5433:5432"
+    #    networks:
+    #        main:
+    #            aliases:
+    #                - lockpush
+    #    logging:
+    #        options:
+    #            max-size: 10m
