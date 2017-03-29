@@ -3,7 +3,8 @@ CURDIR="$(dirname "$(readlink -e "$0")")"
 SECRETS_BASE="/home/secrets"
 DOMAIN_NAME="msgor.com"
 
-echo "\"DOMAIN_NAME=$DOMAIN_NAME\"" > /etc/environment
+echo "\"DOMAIN_NAME=$DOMAIN_NAME\"" >> /etc/environment
+export DOMAIN_NAME
 
 read -p "Type YES (in caps) if you're sure you want to continue. " CONFIRM
 
