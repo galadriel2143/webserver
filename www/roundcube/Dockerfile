@@ -63,6 +63,10 @@ RUN \
       curl -L https://github.com/filhocf/roundcubemail-skin-chameleon/archive/master.tar.gz | \
       tar xz --strip-components=1 -C skins/chameleon
 
+# Fix issue with duo_auth plugin
+RUN sed -i 's/get_input_value/rcube_utils::&/g' plugins/duo_auth/duo_auth.php && \
+    sed -i 's/RCUBE_INPUT_POST/rcube_utils::INPUT_POST/g' plugins/duo_auth/duo_auth.php
+
 USER www-data
 RUN \
     echo "Add Awesome's plugin ===============>>>>>>>>>>>>>" && \
