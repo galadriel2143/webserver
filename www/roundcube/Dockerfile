@@ -21,43 +21,45 @@ WORKDIR /var/www/roundcube
 # RUN curl -L https://github.com/djenniex/phpMemcachedAdmin/archive/master.tar.gz | tar xz --strip-components=1
 RUN \
     curl -L https://github.com/roundcube/roundcubemail/releases/download/$RC_VERSION/roundcubemail-$RC_VERSION-complete.tar.gz | \
-    tar xz --strip-components=1; \
+    tar xz --strip-components=1 && \
     # Get plugins
     # Attention: need to create the final directory before donwload and extract the respective plugin
-      mkdir plugins/contextmenu plugins/contextmenu_folder plugins/message_highlight plugins/infinitescroll \
+      mkdir plugins/duo_auth plugins/contextmenu plugins/contextmenu_folder plugins/message_highlight plugins/infinitescroll \
         plugins/thunderbird_labels plugins/removeattachments plugins/attachment_position skins/melanie2_larry_mobile \
-        plugins/mobile plugins/jquery_mobile skins/mabola-blue skins/mabola skins/chameleon; \
+        plugins/mobile plugins/jquery_mobile skins/mabola-blue skins/mabola skins/chameleon && \
     # Download and install each plugin/skin
+      curl -L https://github.com/tweakier/duo_auth/archive/c3acfaca61c34fed73e140678227461e854ffe15.tar.gz | \
+      tar xz --strip-components=1 -C plugins/duo_auth && \
       curl -L https://github.com/JohnDoh/Roundcube-Plugin-Context-Menu/archive/master.tar.gz | \
-      tar xz --strip-components=1 -C plugins/contextmenu; \
+      tar xz --strip-components=1 -C plugins/contextmenu && \
       curl -L https://github.com/filhocf/contextmenu_folder/archive/master.tar.gz | \
-      tar xz --strip-components=1 -C plugins/contextmenu_folder; \
+      tar xz --strip-components=1 -C plugins/contextmenu_folder && \
       curl -L https://github.com/corbosman/message_highlight/archive/master.tar.gz | \
-      tar xz --strip-components=1 -C plugins/message_highlight; \
+      tar xz --strip-components=1 -C plugins/message_highlight && \
       curl -L https://github.com/messagerie-melanie2/Roundcube-Plugin-Infinite-Scroll/archive/master.tar.gz | \
-      tar xz --strip-components=1 -C plugins/infinitescroll; \
+      tar xz --strip-components=1 -C plugins/infinitescroll && \
       curl -L https://github.com/mike-kfed/rcmail-thunderbird-labels/archive/master.tar.gz | \
-      tar xz --strip-components=1 -C plugins/thunderbird_labels; \
-      #wget -O- https://github.com/dsoares/Roundcube-Plugin-RemoveAttachments/archive/0.2.3.tar.gz    -O removeattach.tar.gz; \
+      tar xz --strip-components=1 -C plugins/thunderbird_labels && \
+      #wget -O- https://github.com/dsoares/Roundcube-Plugin-RemoveAttachments/archive/0.2.3.tar.gz    -O removeattach.tar.gz && \
       curl -L https://github.com/filhocf/Roundcube-Plugin-RemoveAttachments/archive/master.tar.gz | \
-      tar xz --strip-components=1 -C plugins/removeattachments; \
-      #wget -O- https://github.com/dapphp/Roundcube-Plugin-attachment_position/archive/1.0.0.tar.gz   -O attachposition.tar.gz; \
+      tar xz --strip-components=1 -C plugins/removeattachments && \
+      #wget -O- https://github.com/dapphp/Roundcube-Plugin-attachment_position/archive/1.0.0.tar.gz   -O attachposition.tar.gz && \
       curl -L https://github.com/filhocf/Roundcube-Plugin-attachment_position/archive/master.tar.gz | \
-      tar xz --strip-components=1 -C plugins/attachment_position; \
-      #wget -O- https://github.com/teonsystems/roundcube-plugin-keyboard-shortcuts-ng/archive/v0.9.4.tar.gz -O kbshortcutsng.tar.gz; \
-      #wget -O- https://gitlab.awesome-it.de/filhocf/roundcube-plugins/repository/archive.tar.gz?ref=feature_caldav -O kolab.tar.gz; \
-      #wget -O- https://github.com/messagerie-melanie2/Roundcube-Plugin-Roundrive/archive/master.tar.gz  -O roundrive.tar.gz; \
+      tar xz --strip-components=1 -C plugins/attachment_position && \
+      #wget -O- https://github.com/teonsystems/roundcube-plugin-keyboard-shortcuts-ng/archive/v0.9.4.tar.gz -O kbshortcutsng.tar.gz && \
+      #wget -O- https://gitlab.awesome-it.de/filhocf/roundcube-plugins/repository/archive.tar.gz?ref=feature_caldav -O kolab.tar.gz && \
+      #wget -O- https://github.com/messagerie-melanie2/Roundcube-Plugin-Roundrive/archive/master.tar.gz  -O roundrive.tar.gz && \
       curl -L https://github.com/messagerie-melanie2/Roundcube-Skin-Melanie2-Larry-Mobile/archive/master.tar.gz | \
-      tar xz --strip-components=1 -C skins/melanie2_larry_mobile; \
+      tar xz --strip-components=1 -C skins/melanie2_larry_mobile && \
       curl -L https://github.com/messagerie-melanie2/Roundcube-Plugin-Mobile/archive/master.tar.gz  | \
-      tar xz --strip-components=1 -C plugins/mobile; \
+      tar xz --strip-components=1 -C plugins/mobile && \
       curl -L https://github.com/messagerie-melanie2/Roundcube-Plugin-JQuery-Mobile/archive/master.tar.gz | \
-      tar xz --strip-components=1 -C plugins/jquery_mobile; \
+      tar xz --strip-components=1 -C plugins/jquery_mobile && \
     # Get themes
       curl -L https://github.com/EstudioNexos/mabola-blue/archive/master.tar.gz | \
-      tar xz --strip-components=1 -C skins/mabola-blue; \
+      tar xz --strip-components=1 -C skins/mabola-blue && \
       curl -L https://github.com/EstudioNexos/mabola/archive/master.tar.gz | \
-      tar xz --strip-components=1 -C skins/mabola; \
+      tar xz --strip-components=1 -C skins/mabola && \
       curl -L https://github.com/filhocf/roundcubemail-skin-chameleon/archive/master.tar.gz | \
       tar xz --strip-components=1 -C skins/chameleon
 
@@ -91,12 +93,12 @@ RUN composer require --no-suggest roundcube/carddav:2.* && composer install --no
 #USER www-data
 #WORKDIR /var/www//plugins/calendar/lib
 #RUN \
-    #composer -vv remove -n sabre/dav; \
-    #composer -vv remove -n fkooman/oauth-client; \
-    #composer -vv require -n sabre/dav 1.8.12; \
-    #composer -vv require -n sabre/http; \
-    #composer -vv require -n fkooman/oauth-client; \
-    #rm -rf `find /var -iname .composer`; \
+    #composer -vv remove -n sabre/dav && \
+    #composer -vv remove -n fkooman/oauth-client && \
+    #composer -vv require -n sabre/dav 1.8.12 && \
+    #composer -vv require -n sabre/http && \
+    #composer -vv require -n fkooman/oauth-client && \
+    #rm -rf `find /var -iname .composer` && \
     #rm -rf `find /var -iname .git`
 
 USER root

@@ -193,12 +193,17 @@ ROUNDCUBE_MEMCACHE_HOSTS=["memcache:11211"]
 ROUNDCUBE_SENDMAIL_DELAY=5
 ROUNDCUBE_MAX_RECIPIENTS=100
 ROUNDCUBE_EMAIL_DNS_CHECK=true
-ROUNDCUBE_PLUGINS=["managesieve", "vcard_attachments", "emoticons", "carddav"]
+ROUNDCUBE_PLUGINS=["managesieve", "vcard_attachments", "emoticons", "carddav", "duo_auth"]
 
 MANAGESIEVE_HOST=mail.$DOMAIN_NAME
 MANAGESIEVE_USETLS=true
 
 CARDDAV_ADDRESSBOOK_PRESET={"name":"dav.$DOMAIN_NAME","username":"%u","password":"%p","url":"https://dav.$DOMAIN_NAME/dav.php/addressbooks/%u/default","active":true,"readonly":false,"refresh_time":"00:05:00", "fixed":["refresh_time", "name", "username", "password", "url", "hide"], "hide": true}
+
+DUO_AUTH_HOST=$DUO_HOST
+DUO_AUTH_IKEY=$DUO_IKEY
+DUO_AUTH_SKEY=$DUO_SKEY
+DUO_AUTH_AKEY=$DUO_AKEY
 ENV
 fi
 
