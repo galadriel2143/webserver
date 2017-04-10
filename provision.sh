@@ -1,6 +1,7 @@
 #! /bin/bash
 CURDIR="$(dirname "$(readlink -e "$0")")"
 SECRETS_BASE="/home/secrets"
+
 DOMAIN_NAME="msgor.com"
 
 echo "\"DOMAIN_NAME=$DOMAIN_NAME\"" >> /etc/environment
