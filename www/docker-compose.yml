@@ -77,6 +77,7 @@ services:
         image: postgres:9.6
         restart: always
         ports: 
+            - "192.168.255.128:5432:5432"
             - "127.0.0.1:5432:5432"
         env_file: /home/secrets/psql.env
         volumes:
@@ -93,6 +94,7 @@ services:
         image: mysql
         restart: always
         ports:
+            - "192.168.255.128:3306:3306"
             - "127.0.0.1:3306:3306"
         env_file: /home/secrets/mysql.env
         volumes:
