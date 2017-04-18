@@ -26,4 +26,6 @@ for malias in $MAIL_ALIASES ; do
     echo "$MALIAS, $MDEST" >> "$ALIAS_FILE"
 done
 
+postconf -e "message_size_limit = ${ATTACHMENT_SIZE_LIMIT:-10240000}"
+
 exec "$@"

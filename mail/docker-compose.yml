@@ -8,6 +8,7 @@ services:
         ports: 
             - "127.0.0.1:8983:8983"
         container_name: solr
+        restart: always
         networks:
             main:
                 aliases:
@@ -18,6 +19,7 @@ services:
         hostname: mail
         domainname: $DOMAIN_NAME
         container_name: mail
+        restart: always
         ports:
             - "25:25"
             - "587:587"

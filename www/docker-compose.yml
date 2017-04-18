@@ -10,6 +10,7 @@ services:
             - /home/ownclouddata/data/widget/files/music:/media:ro
             - /home/ampache/config:/var/www/config
             - /home/ampache/themes:/var/www/themes
+        restart: always
         networks:
             main:
                 aliases:
@@ -19,6 +20,7 @@ services:
                 max-size: 10m
     cadvisor:
         image: google/cadvisor:v0.25.0
+        restart: always
         volumes:
             - /:/rootfs:ro
             - /var/run:/var/run:rw
@@ -49,6 +51,7 @@ services:
         env_file: /home/secrets/owncloud.env
         volumes:
             - /home/ownclouddata:/var/www/html
+        restart: always
         depends_on:
             - mysql
         networks:
@@ -60,6 +63,7 @@ services:
                 max-size: 10m
     memcached:
         image: memcached
+        restart: always
         env_file: /home/secrets/memcached.env
         networks:
             main:
@@ -71,6 +75,7 @@ services:
                 max-size: 10m
     psql:
         image: postgres:9.6
+        restart: always
         ports: 
             - "127.0.0.1:5432:5432"
         env_file: /home/secrets/psql.env
@@ -86,6 +91,7 @@ services:
                 max-size: 10m
     mysql:
         image: mysql
+        restart: always
         ports:
             - "127.0.0.1:3306:3306"
         env_file: /home/secrets/mysql.env
@@ -101,6 +107,7 @@ services:
     fpm:
         build: 
             context: ./fpm
+        restart: always
         env_file: /home/secrets/fpm.env
         volumes: 
             - /home/www:/var/mywww
@@ -114,6 +121,7 @@ services:
     agendav:
         build:
             context: ./agendav
+        restart: always
         env_file: /home/secrets/agendav.env
         networks:
             - main
@@ -129,6 +137,7 @@ services:
     baikal:
         build:
             context: ./baikal
+        restart: always
         env_file: /home/secrets/baikal.env
         depends_on:
             - mysql
@@ -155,6 +164,7 @@ services:
     roundcube:
         build:
             context: ./roundcube
+        restart: always
         env_file: /home/secrets/roundcube.env
         depends_on:
             #- memcached
@@ -173,6 +183,7 @@ services:
         #    - "mail.msgor.com:$localhost"
     nginx:
         image: nginx:stable
+        restart: always
         env_file: /home/secrets/nginx.env
         volumes_from:
             - owncloud:ro
