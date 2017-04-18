@@ -12,6 +12,8 @@ CONTAINER_COUNT="$(docker inspect $CONTAINER_IDS | jq -r '.[].State.Running | se
 echo $CONTAINER_COUNT
 if [ "$CONTAINER_COUNT" == 15 ] ; then
     docker volume prune
+    docker ps -a -q | xargs docker rm 
+    docker images -q | xargs docker rmi
 else
     echo "You shouldn't prune volumes if some containers are down. You could lose data!"
 fi
