@@ -6,8 +6,10 @@ DCWWW="docker-compose -f $CURDIR/www/docker-compose.yml"
 DCMAIL="docker-compose -f $CURDIR/mail/docker-compose.yml"
 DCVPN="docker-compose -f $CURDIR/vpn/docker-compose.yml" 
 
-CONTAINER_COUNT=$({$DCWWW ps -q ; $DCVPN ps -q ; $DCMAIL ps -q ; } | xargs docker inspect | jq -r '.[].State.Running | select(. == true)' | wc -l)
+CONTAINER_IDS="$($DCWWW ps -q ; $DCVPN ps -q ; $DCMAIL ps -q)"
+CONTAINER_COUNT="$(docker inspect $CONTAINER_IDS | jq -r '.[].State.Running | select(. == true)' | wc -l)"
 
+echo $CONTAINER_COUNT
 if [ "$CONTAINER_COUNT" == 15 ] ; then
     docker volume prune
 else
