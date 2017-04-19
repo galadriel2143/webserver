@@ -2,6 +2,14 @@ version: '2'
 networks:
     main:
 services:
+    dns:
+        image: andyshinn/dnsmasq:2.76
+        cap_add:
+            - NET_ADMIN
+        networks:
+            main:
+                aliases:
+                    - dns
     vpn:
         image: kylemanna/openvpn:2.1.0
         volumes:
@@ -12,3 +20,7 @@ services:
             - "443:1194/udp"
             - "1194:1194/udp"
             - "1194:1194/tcp"
+        networks:
+            main:
+                aliases:
+                    - vpn
