@@ -3,9 +3,17 @@ networks:
     main:
 services:
     dns:
-        image: andyshinn/dnsmasq:2.76
+        image: andyshinn/dnsmasq:2.75
+        volumes:
+            - /home/openvpn/etc/dnsmasq.conf:/etc/dnsmasq.conf
+        ports:
+            - "192.168.255.128:53:53/tcp"
+            - "192.168.255.128:53:53/udp"
         cap_add:
             - NET_ADMIN
+        restart: always
+        depends_on:
+            - vpn
         networks:
             main:
                 aliases:
@@ -16,6 +24,7 @@ services:
             - /home/openvpn/data:/etc/openvpn
         cap_add:
             - NET_ADMIN
+        restart: always
         ports:
             - "443:1194/udp"
             - "1194:1194/udp"
