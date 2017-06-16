@@ -1,0 +1,85 @@
+version: '2'
+networks:
+    main:
+    www_main:
+        external: true
+services:
+    rethinkdb:
+        image: rethinkdb
+        ports:
+            - "8080"
+            - "28015"
+            - "29015"
+        networks:
+            main:
+                aliases:
+                    - rekthinkdb
+        logging:
+            options:
+                max-size: 10m
+
+    proxy:
+        image: ehazlett/docker-proxy:latest
+        command: -i
+        volumes:
+            - "/var/run/docker.sock:/var/run/docker.sock"
+        ports:
+            - "2375"
+        networks:
+            main:
+                aliases:
+                    - proxy
+        logging:
+            options:
+                max-size: 10m
+
+    swarm:
+        image: swarm:latest
+        command: m --host tcp://0.0.0.0:2375 proxy:2375
+        ports:
+            - "2375"
+        networks:
+            main:
+                aliases:
+                    - swarm
+        logging:
+            options:
+                max-size: 10m
+
+    media:
+        build:
+            context: .
+            dockerfile: Dockerfile.build
+
+        entrypoint: /bin/bash
+        command: -c "make media && sleep infinity"
+        working_dir: /go/src/github.com/shipyard/shipyard
+        volumes:
+            - "/go/src/github.com/shipyard/shipyard/controller/static"
+        networks:
+            main:
+                aliases:
+                    - media
+        logging:
+            options:
+                max-size: 10m
+
+    controller:
+        build:
+            context: .
+            dockerfile: Dockerfile.build
+
+        entrypoint: /bin/bash
+        command: -c "make build && cd controller && ./controller -D server --rethinkdb-addr rethinkdb:28015 -d tcp://swarm:2375"
+        networks:
+            www_main:
+                aliases:
+                    - shipyard
+            main:
+                aliases:
+                    - controller
+        logging:
+            options:
+                max-size: 10m
+        volumes_from:
+            - media

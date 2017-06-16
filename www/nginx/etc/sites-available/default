@@ -17,11 +17,12 @@ server {
     ssl_certificate     /etc/letsencrypt/live/www/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/www/privkey.pem;
 
+    set $fpm_root /var/mywww;
+    root /var/mywww;
+
     include defaults.conf;
 
     server_name msgor.com;
-
-    root /var/mywww;
 
 	location /lockpush/ {
         access_log off;
@@ -40,34 +41,44 @@ server {
 
 # Temporary endpoint for messing around with new stuff.
 server {
-    ssl on;
-    listen 443;
-
     ssl_certificate     /etc/letsencrypt/live/temp/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/temp/privkey.pem;
 
-    include deny.conf;
+    set $fpm_root /var/www/html;
+    root $fpm_root;
+
+    include defaults.conf;
 
     server_name temp.msgor.com;
 
+    set $p_fastcgi_pass wordpress:9000;
+    include php.conf;
+}
+
+server {
+    ssl_certificate     /etc/letsencrypt/live/shipyard/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/shipyard/privkey.pem;
+
+    include defaults.conf;
+
+    server_name shipyard.msgor.com;
+
 	location / {
+        proxy_buffering off;
         proxy_set_header Host $host;
         proxy_redirect off;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_pass http://ampache:80/;
+        proxy_pass http://shipyard:8080/;
         break;
     }
 }
 
 server {
-    ssl on;
-    listen 443;
-
     ssl_certificate     /etc/letsencrypt/live/stats/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/stats/privkey.pem;
 
-    include deny.conf;
+    include defaults.conf;
 
     server_name stats.msgor.com;
 
@@ -88,6 +99,9 @@ server {
     ssl_certificate     /etc/letsencrypt/live/cloud/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/cloud/privkey.pem;
 
+    set $fpm_root /var/www/html;
+    root /var/www/owncloud;
+
     include defaults.conf;
 
     server_name cloud.msgor.com;
@@ -100,8 +114,6 @@ server {
         deny all;
     }
 
-    root /var/www/html;
-
     set $p_fastcgi_pass owncloud:9000;
     include php.conf;
 
@@ -112,12 +124,13 @@ server {
     ssl_certificate     /etc/letsencrypt/live/cal/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/cal/privkey.pem;
 
+    set $fpm_root /var/www/agendav/web/public;
+    root $fpm_root;
+
     include defaults.conf;
     include static_cache.conf;
 
     server_name "cal.msgor.com";
-
-    root /var/www/agendav/web/public;
 
     set $p_fastcgi_pass agendav:9000;
     include php.conf;
@@ -131,12 +144,13 @@ server {
     ssl_certificate     /etc/letsencrypt/live/cube/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/cube/privkey.pem;
 
+    set $fpm_root /var/www/roundcube;
+    root $fpm_root;
+
     include defaults.conf;
     include static_cache.conf;
 
     server_name "cube.msgor.com";
-
-    root /var/www/roundcube;
 
     location /temp {
         deny all;
@@ -150,7 +164,6 @@ server {
         deny all;
     }
 
-
     set $p_fastcgi_pass roundcube:9000;
     include php.conf;
 
@@ -163,10 +176,11 @@ server {
     ssl_certificate     /etc/letsencrypt/live/dav/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/dav/privkey.pem;
 
+    set $fpm_root /var/www/calendar_server/html;
+    root $fpm_root;
+
     include defaults.conf;
     include static_cache.conf;
-
-    root /var/www/calendar_server/html;
 
     server_name "dav.msgor.com";
 

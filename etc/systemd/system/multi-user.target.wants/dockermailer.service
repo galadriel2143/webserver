@@ -1,5 +1,5 @@
 [Unit]
-Description=primary docker-compose container
+Description=docker-compose mail container
 After=docker.service
 Requires=docker.service
 

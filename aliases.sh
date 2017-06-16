@@ -6,6 +6,7 @@ CURDIR=/home/docker
 alias "dcwww=sudo docker-compose -f $CURDIR/www/docker-compose.yml"
 alias "dcvpn=sudo docker-compose -f $CURDIR/vpn/docker-compose.yml"
 alias "dcmail=sudo docker-compose -f $CURDIR/mail/docker-compose.yml"
+alias "dcship=sudo docker-compose -f $CURDIR/shipyard/docker-compose.yml"
 
 alias "occ=dcwww exec --user www-data owncloud php occ"
 

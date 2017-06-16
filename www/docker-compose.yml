@@ -4,6 +4,31 @@ networks:
     mail_main:
         external: true
 services:
+    portainer:
+        image: portainer/portainer:linux-amd64-1.12.4
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        privileged: true
+        networks:
+            main:
+                aliases:
+                    - portainer
+        logging:
+            options:
+                max-size: 10m
+    wordpress:
+        image: wordpress:4-php7.1-fpm
+        restart: always
+        env_file: /home/secrets/wordpress.env
+        depends_on:
+            - mysql
+        networks:
+            main:
+                aliases:
+                    - wordpress
+        logging:
+            options:
+                max-size: 10m
     ampache:
         image: ampache/ampache
         volumes:
@@ -113,6 +138,7 @@ services:
         env_file: /home/secrets/fpm.env
         volumes: 
             - /home/www:/var/mywww
+            - /home/docker/www/nginx/etc/sites-available:/sites-available:ro
         networks:
             main:
                 aliases:
@@ -188,12 +214,13 @@ services:
         restart: always
         env_file: /home/secrets/nginx.env
         volumes_from:
-            - owncloud:ro
             - fpm:ro
             - baikal:ro
             - agendav:ro
             - roundcube:ro
+            - wordpress:ro
         volumes:
+            - /home/ownclouddata:/var/www/owncloud:ro
             - /var/www/letsencrypt:/var/www/letsencrypt:ro
             - /home/docker/www/nginx/etc:/etc/nginx:ro
             - /home/letsencrypt/etc:/etc/letsencrypt:ro
