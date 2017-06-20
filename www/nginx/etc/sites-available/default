@@ -17,12 +17,28 @@ server {
     ssl_certificate     /etc/letsencrypt/live/www/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/www/privkey.pem;
 
+    set $fpm_root /var/www/html;
+    root $fpm_root;
+
+    include defaults.conf;
+
+    server_name msgor.com;
+
+    set $p_fastcgi_pass wordpress:9000;
+    include php.conf;
+}
+
+
+server {
+    ssl_certificate     /etc/letsencrypt/live/frag/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/frag/privkey.pem;
+
     set $fpm_root /var/mywww;
     root /var/mywww;
 
     include defaults.conf;
 
-    server_name msgor.com;
+    server_name frag.msgor.com;
 
 	location /lockpush/ {
         access_log off;
