@@ -14,3 +14,4 @@ alias 'mysqlr=mysql -h 127.0.0.1 -u root "-p$(sudo cat /home/secrets/mysql.env |
 alias 'psqlr=PGPASSWORD=$(sudo cat /home/secrets/psql.env | awk "-F=" "{print \$2}") psql -h localhost -U postgres'
 alias 'vpn-keygen=dcvpn exec vpn easyrsa build-client-full'
 alias 'vpn-keyget=dcvpn exec vpn ovpn_getclient'
+alias 'nghup=dcwww kill -s HUP nginx'
