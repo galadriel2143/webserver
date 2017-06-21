@@ -1,5 +1,5 @@
 # webserver
-Repository for widget2143's webserver provisioning scripts, for widget2143's personal webserver.
+Repository for galadriel2143's webserver provisioning scripts, for galadriel2143's personal webserver.
 
 Brief description of files:
 
