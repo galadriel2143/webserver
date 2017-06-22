@@ -7,6 +7,7 @@ alias "dcwww=sudo docker-compose -f $CURDIR/www/docker-compose.yml"
 alias "dcvpn=sudo docker-compose -f $CURDIR/vpn/docker-compose.yml"
 alias "dcmail=sudo docker-compose -f $CURDIR/mail/docker-compose.yml"
 alias "dcship=sudo docker-compose -f $CURDIR/shipyard/docker-compose.yml"
+alias "dockviz=docker run -it --rm -v /var/run/docker.sock:/var/run/docker.sock nate/dockviz"
 
 alias "occ=dcwww exec --user www-data owncloud php occ"
 
