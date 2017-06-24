@@ -51,7 +51,7 @@ apt-get install -y --no-install-recommends curl python-software-properties pytho
     curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash - && \
     apt-get remove -y nodejs npm 'vim.*' && \
     apt-get update && \
-    apt-get install -y gdebi-core virtualenv python-virtualenv python-pip checkinstall dos2unix cadaver nmap graphviz expect supervisor vim-nox-py2 tmux htop mysql-client postgresql-client git nodejs docker-engine linux-image-extra-virtual linux-image-extra-$(uname -r) apt-transport-https ca-certificates pwgen build-essential ssl-cert ipcalc libpam-duo acl jq || exit 1
+    apt-get install -y unattended-upgrades gdebi-core virtualenv python-virtualenv python-pip checkinstall dos2unix cadaver nmap graphviz expect supervisor vim-nox-py2 tmux htop mysql-client postgresql-client git nodejs docker-engine linux-image-extra-virtual linux-image-extra-$(uname -r) apt-transport-https ca-certificates pwgen build-essential ssl-cert ipcalc libpam-duo acl jq || exit 1
 
 #Systempony
 gdebi -n "$CURDIR/systempony.deb"
