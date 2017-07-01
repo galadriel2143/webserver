@@ -2,22 +2,6 @@ version: '2'
 networks:
     main:
 services:
-    dns:
-        image: andyshinn/dnsmasq:2.75
-        volumes:
-            - /home/openvpn/etc/dnsmasq.conf:/etc/dnsmasq.conf
-        ports:
-            - "192.168.255.128:53:53/tcp"
-            - "192.168.255.128:53:53/udp"
-        cap_add:
-            - NET_ADMIN
-        restart: always
-        depends_on:
-            - vpn
-        networks:
-            main:
-                aliases:
-                    - dns
     vpn:
         image: kylemanna/openvpn:2.1.0
         volumes:

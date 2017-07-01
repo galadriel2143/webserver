@@ -1,7 +1,7 @@
 [Unit]
 Description=primary docker-compose container
-After=dockermailer.service
-Requires=dockermailer.service
+After=dockermailer.service dockervpn.service
+Requires=dockermailer.service dockervpn.service
 
 [Service]
 Type=idle

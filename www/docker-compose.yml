@@ -3,7 +3,28 @@ networks:
     main:
     mail_main:
         external: true
+    vpn_main:
+        external: true
 services:
+    # Putting this here is weird.
+    dns:
+        image: andyshinn/dnsmasq:2.75
+        volumes:
+            - /home/openvpn/etc/dnsmasq.conf:/etc/dnsmasq.conf
+        ports:
+            - "192.168.255.128:53:53/tcp"
+            - "192.168.255.128:53:53/udp"
+        cap_add:
+            - NET_ADMIN
+        restart: always
+        networks:
+            vpn_main:
+                aliases:
+                    - dns
+            main:
+                aliases:
+                    - dns
+
     portainer:
         image: portainer/portainer:linux-amd64-1.12.4
         volumes:
@@ -29,6 +50,18 @@ services:
         logging:
             options:
                 max-size: 10m
+
+    ampacheslim:
+        image: plusminus/ampache
+        restart: always
+        networks:
+            main:
+                aliases:
+                    - ampacheslim
+        logging:
+            options:
+                max-size: 10m
+
     ampache:
         image: ampache/ampache
         volumes:
