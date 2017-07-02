@@ -54,6 +54,7 @@ services:
     ampacheslim:
         image: plusminus/ampache
         volumes:
+            - /home/ownclouddata/data/widget/files/music:/media:ro
             - /home/ampache/config:/var/www/html/config
             - /home/ampache/themes:/var/www/html/themes
             - /home/ampache/data:/var/data
