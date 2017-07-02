@@ -53,27 +53,15 @@ services:
 
     ampacheslim:
         image: plusminus/ampache
+        volumes:
+            - /home/ampache/config:/var/www/html/config
+            - /home/ampache/themes:/var/www/html/themes
+            - /home/ampache/data:/var/data
         restart: always
         networks:
             main:
                 aliases:
                     - ampacheslim
-        logging:
-            options:
-                max-size: 10m
-
-    ampache:
-        image: ampache/ampache
-        volumes:
-            - /home/ownclouddata/data/widget/files/music:/media:ro
-            - /home/ampache/db-conf:/etc/mysql:ro
-            - /home/ampache/db:/var/lib/mysql
-            - /home/ampache/config:/var/www/config
-            - /home/ampache/themes:/var/www/themes
-        restart: always
-        networks:
-            main:
-                aliases:
                     - ampache
         logging:
             options:

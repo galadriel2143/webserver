@@ -83,15 +83,23 @@ server {
     ssl_certificate     /etc/letsencrypt/live/temp/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/temp/privkey.pem;
 
-    set $fpm_root /var/www/html;
-    root $fpm_root;
-
     include defaults.conf;
 
     server_name temp.msgor.com;
 
-    set $p_fastcgi_pass wordpress:9000;
-    include php.conf;
+    location = /themes/reborn/templates/.css {
+        rewrite ^(.*).css$ $1/default.css;
+    }
+
+	location / {
+        proxy_buffering off;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://ampacheslim:80/;
+        break;
+    }
 }
 
 server {
