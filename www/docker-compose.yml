@@ -52,7 +52,8 @@ services:
                 max-size: 10m
 
     ampacheslim:
-        image: plusminus/ampache
+        build:
+            context: ./ampache
         volumes:
             - /home/ownclouddata/data/widget/files/music:/media:ro
             - /home/ampache/config:/var/www/html/config

@@ -7,10 +7,10 @@ for each in $(cat /home/docker/www/nginx/etc/sites-enabled/default | grep -o -P 
     if [ "$each" == "www" ] ; then
         SUBDOMAIN="$DOMAIN_NAME"
     fi
-    docker run --rm -it --name letsencrypt \
+    docker run --rm -it --name certbot \
         -v "$BASE:/etc/letsencrypt" \
         -v "$WEBROOT:$WEBROOT" \
-        quay.io/letsencrypt/letsencrypt:latest \
+        certbot/certbot:latest \
         auth --authenticator webroot \
         --webroot-path "$WEBROOT" \
         --domain=$SUBDOMAIN \
