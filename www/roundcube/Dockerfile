@@ -8,7 +8,10 @@ ARG RC_VERSION=1.3-beta
 
 RUN mkdir -p /var/www/roundcube && chown -R www-data:www-data /var/www/roundcube
 
-RUN apt-get update && apt-get install -y --no-install-recommends git libz-dev libmemcached-dev mysql-client unzip "libldap-.*" libpng-dev
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git libz-dev libmemcached-dev mysql-client unzip "libldap-.*" libpng-dev \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN pecl install memcached
 

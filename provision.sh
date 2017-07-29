@@ -41,17 +41,21 @@ ikey = $DUO_IKEY
 skey = $DUO_SKEY
 INI
 
+read -s -p "Enter Linode API Token: " LINODE_API_TOKEN
+
 rsync -rav "$CURDIR/etc/." "/etc/."
 
 # Install
 apt-get install -y --no-install-recommends curl python-software-properties python3-software-properties software-properties-common && \
     curl -fsSL https://yum.dockerproject.org/gpg | sudo apt-key add - && \
     apt-key fingerprint 58118E89F3A912897C070ADBF76221572C52609D && \
+    add-apt-repository "deb http://apt.linode.com/ $(lsb_release -cs) main" && \
+    wget -O- https://apt.linode.com/linode.gpg | sudo apt-key add - && \
     add-apt-repository "deb https://apt.dockerproject.org/repo/ ubuntu-$(lsb_release -cs) main" && \
     curl -sL https://deb.nodesource.com/setup_7.x | sudo -E bash - && \
     apt-get remove -y nodejs npm 'vim.*' && \
     apt-get update && \
-    apt-get install -y w3m unattended-upgrades gdebi-core virtualenv python-virtualenv python-pip checkinstall dos2unix cadaver nmap graphviz expect supervisor vim-nox-py2 tmux htop mysql-client postgresql-client git nodejs docker-engine linux-image-extra-virtual linux-image-extra-$(uname -r) apt-transport-https ca-certificates pwgen build-essential ssl-cert ipcalc libpam-duo acl jq || exit 1
+    apt-get install -y linode-cli w3m unattended-upgrades gdebi-core virtualenv python-virtualenv python-pip checkinstall dos2unix cadaver nmap graphviz expect supervisor vim-nox-py2 tmux htop mysql-client postgresql-client git nodejs docker-engine linux-image-extra-virtual linux-image-extra-$(uname -r) apt-transport-https ca-certificates pwgen build-essential ssl-cert ipcalc libpam-duo acl jq imagemagick || exit 1
 
 #Systempony
 gdebi -n "$CURDIR/systempony.deb"
@@ -145,6 +149,7 @@ ENV
 fi
 
 cat <<ENV > "$SECRETS_BASE/fpm.env"
+LINODE_API_TOKEN=$LINODE_API_TOKEN
 ENV
 
 cat <<ENV > "$SECRETS_BASE/nginx.env"
@@ -246,7 +251,7 @@ ENV
 systemctl daemon-reload
 service docker-compose restart
 
-"$CURDIR/letsencrypt/letsencrypt.sh"
+"$CURDIR/letsencrypt.sh"
 
 CREATES="wordpress:$MYSQL_WORDPRESS_PASSWORD roundcube:$MYSQL_ROUNDCUBE_PASSWORD owncloud:$MYSQL_OWNCLOUD_PASSWORD baikal:$MYSQL_BAIKAL_PASSWORD"
 for create in $CREATES ; do

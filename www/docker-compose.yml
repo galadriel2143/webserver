@@ -25,6 +25,19 @@ services:
                 aliases:
                     - dns
 
+    deluge:
+        # This is also weird. Maybe dangerous.
+        network_mode: host
+
+        image: linuxserver/deluge:74
+        environment:
+            PUID: www-data
+            PGID: www-data
+            TZ: America/New_York
+        volumes: 
+            - /home/deluge/downloads:/downloads
+            - /home/deluge/config:/config
+
     portainer:
         image: portainer/portainer:linux-amd64-1.12.4
         volumes:

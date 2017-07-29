@@ -1,20 +1,32 @@
 #! /bin/bash
 BASE="/home/letsencrypt/etc"
 WEBROOT="/var/www/letsencrypt"
+
+LINODE_API_TOKEN="$(sudo cat /home/secrets/fpm.env | grep LINODE_API_TOKEN | awk -F= '{ print $2 }')"
+
 for each in $(cat /home/docker/www/nginx/etc/sites-enabled/default | grep -o -P 'ssl_certificate_key.*?;' | tr '#' ' ' | awk '{print $2}' | awk '-F/' '{print $(NF-1)}') mail ; do
     FOLDERNAME="$each"
     SUBDOMAIN="$each.$DOMAIN_NAME"
     if [ "$each" == "www" ] ; then
         SUBDOMAIN="$DOMAIN_NAME"
     fi
+
+    HASDOMAIN="$(linode-domain -a record-list --api-key "$LINODE_API_TOKEN" -l "$DOMAIN_NAME" -t A -j | jq -r '."msgor.com".records[] | select(.name == "'"$each"'")' | wc -l)"
+    if [ "$HASDOMAIN" == "0" ] ; then
+        echo "Creating domain $SUBDOMAIN"
+        linode-domain --api-key "$LINODE_API_TOKEN" -a record-create -l "$DOMAIN_NAME" -n "$each" -t A -R '[remote_addr]' || exit 1
+        # Wait some seconds
+        sleep 60
+    fi
+
     docker run --rm -it --name certbot \
         -v "$BASE:/etc/letsencrypt" \
         -v "$WEBROOT:$WEBROOT" \
-        certbot/certbot:latest \
+        certbot/certbot:v0.15.0 \
         auth --authenticator webroot \
         --webroot-path "$WEBROOT" \
         --domain=$SUBDOMAIN \
-        --email=webmaster@msgor.com
+        --email=webmaster@$DOMAIN_NAME
     LNPATH="$BASE/live/$FOLDERNAME"
     rm "$LNPATH" ; ln -s "$SUBDOMAIN" "$LNPATH"
 done
