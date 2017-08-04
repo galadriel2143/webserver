@@ -16,3 +16,4 @@ alias 'psqlr=PGPASSWORD=$(sudo cat /home/secrets/psql.env | awk "-F=" "{print \$
 alias 'vpn-keygen=dcvpn exec vpn easyrsa build-client-full'
 alias 'vpn-keyget=dcvpn exec vpn ovpn_getclient'
 alias 'nghup=dcwww kill -s HUP nginx'
+alias 'ampacheuser=php /var/www/html/bin/install/add_user.inc'
