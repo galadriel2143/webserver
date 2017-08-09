@@ -259,6 +259,7 @@ services:
             - wordpress:ro
         volumes:
             - /home/ownclouddata:/var/www/owncloud:ro
+            - /home/nginx/etc/tempsite.conf:/etc/tempsite.conf:ro
             - /var/www/letsencrypt:/var/www/letsencrypt:ro
             - /home/docker/www/nginx/etc:/etc/nginx:ro
             - /home/letsencrypt/etc:/etc/letsencrypt:ro
