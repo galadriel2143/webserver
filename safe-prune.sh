@@ -35,7 +35,7 @@ fi
 CONTAINER_COUNT="$(docker inspect $CONTAINER_IDS | jq -r '.[].State.Running | select(. == true)' | wc -l)"
 
 echo $CONTAINER_COUNT
-if [ "$CONTAINER_COUNT" == 23 ] ; then
+if [ "$CONTAINER_COUNT" == 24 ] ; then
     docker volume prune
     docker ps -a -q | xargs docker rm 
     docker images -q | xargs docker rmi

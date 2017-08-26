@@ -84,18 +84,6 @@ services:
         logging:
             options:
                 max-size: 10m
-    lockpush:
-        build:
-            context: /home/widget/lockpush
-        depends_on:
-            - mysql
-        networks:
-            main:
-                aliases:
-                    - lockpush
-        logging:
-            options:
-                max-size: 10m
     owncloud:
         build:
             context: ./owncloud
@@ -264,16 +252,28 @@ services:
         logging:
             options:
                 max-size: 10m
-    #oldpsql:
-    #    image: postgres:9.1
-    #    volumes: 
-    #        - /home/widget/oldpsql:/var/lib/postgresql/data
-    #    ports:
-    #        - "127.0.0.1:5433:5432"
-    #    networks:
-    #        main:
-    #            aliases:
-    #                - lockpush
-    #    logging:
-    #        options:
-    #            max-size: 10m
+
+    # Random stuff not included in webserver repo.
+
+    lockpush:
+        build:
+            context: /home/widget/lockpush
+        depends_on:
+            - mysql
+        networks:
+            main:
+                aliases:
+                    - lockpush
+        logging:
+            options:
+                max-size: 10m
+
+    corgibot:
+        build:
+            context: /home/widget/corgibot
+        volumes:
+            - /home/corgibot/config.json:/app/config.json:ro
+        # Container has no networks to prevent access from others.
+        logging:
+            options:
+                max-size: 10m
