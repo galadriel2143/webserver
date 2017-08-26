@@ -1,8 +1,9 @@
-FROM node:7.7
+FROM node:8.0
 
-RUN apt-get update
-
-RUN apt-get install -y --no-install-recommends mysql-client
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends mysql-client && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /app
 
@@ -10,7 +11,7 @@ WORKDIR /app
 
 COPY package.json .
 
-RUN npm install --production
+RUN yarn install --production
 
 COPY . .
 
