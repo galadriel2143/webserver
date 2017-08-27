@@ -1,4 +1,4 @@
-FROM solr:6.4
+FROM solr:6.4-alpine
 
 USER $SOLR_USER
 
