@@ -70,6 +70,10 @@ usermod -a -G docker $ADDUSER && \
     usermod -a -G docker $USER && \
     usermod -a -G sudo $ADDUSER || exit 1
 
+#Alpine
+groupadd -g 82 www-alp
+useradd -d /var/www -s /bin/false -M -g 82 -u 82 www-alp
+
 mkdir "$SECRETS_BASE"
 
 # More duo setup

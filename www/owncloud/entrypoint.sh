@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/sh
 set -e
 
 if [ ! -e '/var/www/html/version.php' ]; then
@@ -18,18 +18,20 @@ sed -i -e "s/DUO_SKEY/$( echo "${DUO_SKEY}" | sed -e 's/[\/}]/\\&/g')/" ${CONFIG
 sed -i -e "s/DUO_HOST/$( echo "${DUO_HOST}" | sed -e 's/[\/}]/\\&/g')/" ${CONFIG_FILE}
 sed -i -e "s/DUO_AKEY/$( echo "${DUO_AKEY}" | sed -e 's/[\/}]/\\&/g')/" ${CONFIG_FILE}
 
-runuser -s /bin/sh -c "php /var/www/html/occ maintenance:install --database-host $DB_HOST --database-name $DB_NAME --database-user $DB_USER --database-pass $DB_PASS --admin-user $ADMIN_USER --admin-pass $ADMIN_PASS" www-data || echo "Install already executed!"
+SU="su -s /bin/sh -c"
+
+$SU "php /var/www/html/occ maintenance:install --database-host $DB_HOST --database-name $DB_NAME --database-user $DB_USER --database-pass $DB_PASS --admin-user $ADMIN_USER --admin-pass $ADMIN_PASS" www-data || echo "Install already executed!"
 
 if [ ! -z "$DUO_IKEY" ] && [ ! -z "$DUO_HOST" ] && [ ! -z "$DUO_AKEY" ] && [ ! -z "$DUO_SKEY" ] ; then
-    runuser -s /bin/sh -c "php /var/www/html/occ app:enable duo" www-data
+    $SU "php /var/www/html/occ app:enable duo" www-data && echo "Duo enabled"
 else
-    runuser -s /bin/sh -c "php /var/www/html/occ app:disable duo" www-data
+    $SU "php /var/www/html/occ app:disable duo" www-data && echo "Duo disabled"
 fi
 
-runuser -s /bin/sh -c "php /var/www/html/occ config:system:set trusted_domains" www-data
+$SU "php /var/www/html/occ config:system:set trusted_domains" www-data
 TRUST_COUNT=0
 for domain in $TRUSTED_DOMAINS ; do
-    runuser -s /bin/sh -c "php /var/www/html/occ config:system:set trusted_domains $TRUST_COUNT --value=$domain" www-data
+    $SU "php /var/www/html/occ config:system:set trusted_domains $TRUST_COUNT --value=$domain" www-data
     TRUST_COUNT=$((TRUST_COUNT+1))
 done
 
