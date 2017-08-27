@@ -225,7 +225,8 @@ services:
         #extra_hosts:
         #    - "mail.msgor.com:$localhost"
     nginx:
-        image: nginx:stable-alpine
+        build:
+            context: ./nginx/build
         restart: always
         env_file: /home/secrets/nginx.env
         volumes_from:
