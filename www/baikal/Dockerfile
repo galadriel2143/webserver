@@ -1,4 +1,4 @@
-FROM                    php:7.1-fpm
+FROM                    php:7.1-fpm-alpine
 MAINTAINER              pr3d4t0r
 
 
@@ -9,25 +9,21 @@ LABEL                   license="See: LICENSE.txt for complete licensing informa
 LABEL                   support="caldav AT cime.net"
 LABEL                   version="2.1"
 
-### "configure-apt"
-RUN                     echo "APT::Get::Assume-Yes true;" >> /etc/apt/apt.conf.d/80custom; \
-                        echo "APT::Get::Quiet true;" >> /etc/apt/apt.conf.d/80custom; \
-                        rm -Rvf /var/lib/apt/lists/*; \
-                        apt-get update
-
 ### "configure-postfix"
 #
 # These parameters are specific to your own Postfix relay!  Use your host and domain
 # names.
-RUN                     echo "postfix postfix/mailname string msgor.com" | debconf-set-selections && \
-                        echo "postfix postfix/main_mailer_type string 'Satellite system'" | debconf-set-selections && \
-                        echo "postfix postfix/relayhost string msgor.com" | debconf-set-selections && \
-                        echo "postfix postfix/root_address string cal-bounce@msgor.com" | debconf-set-selections
+# FIXME Not sure how to set these in Alpine...
+#RUN                     echo "postfix postfix/mailname string msgor.com" | debconf-set-selections && \
+#                        echo "postfix postfix/main_mailer_type string 'Satellite system'" | debconf-set-selections && \
+#                        echo "postfix postfix/relayhost string msgor.com" | debconf-set-selections && \
+#                        echo "postfix postfix/root_address string cal-bounce@msgor.com" | debconf-set-selections
 
 ### "system-requirements"
-RUN                     apt-get install curl libcurl4-openssl-dev postfix mailutils rsyslog unzip libxml2-dev
+RUN                     apk add --no-cache curl postfix rsyslog unzip
+# mailutils ???
 
-RUN                     docker-php-ext-install -j$(nproc) pdo_mysql
+RUN docker-php-ext-install pdo_mysql
 
 ### "set-locale"
 #RUN                     locale-gen en_US.UTF-8 && \

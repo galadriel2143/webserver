@@ -10,5 +10,5 @@ done
 for each in www mail vpn shipyard ; do
     DOCKER_COMPOSE="docker-compose -f $CURDIR/$each/docker-compose.yml" 
     $DOCKER_COMPOSE rm
-    $DOCKER_COMPOSE build
+    $DOCKER_COMPOSE build || exit $?
 done

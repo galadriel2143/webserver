@@ -196,6 +196,7 @@ services:
         env_file: /home/secrets/baikal.env
         depends_on:
             - nginx
+            - baikal
         networks:
             main:
                 aliases:

@@ -5,18 +5,18 @@ MAINTAINER Jan Losinski <losinski@wh2.tu-dresden.de>
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
-        libpq-dev \
-        libmcrypt-dev \
-        libcurl4-openssl-dev \
-        postgresql-client \
-        wget \
-        ca-certificates && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache \
+    postgresql-client \
+    wget \
+    ca-certificates \
+    libpq \
+    postgresql-dev \
+    libmcrypt-dev \
+    libmcrypt \
+    curl \
+    curl-dev
 
-RUN docker-php-ext-install -j$(nproc) pdo_pgsql mcrypt curl
+RUN docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) pdo_pgsql mcrypt curl opcache
 
 #COPY phpinfo.php /var/www/agendav/web/public/phpinfo.php
 

@@ -11,7 +11,7 @@ RUN echo deb http://www.deb-multimedia.org jessie main non-free >> /etc/apt/sour
                         && apt-get update && apt-get install -y -q git ffmpeg libgd3 libpng-dev libjpeg-dev libfreetype6-dev \
                         && apt-get clean \
                         && rm -rf /var/lib/apt/lists/* \
-                        && docker-php-ext-install pdo_mysql gettext gd
+                        && docker-php-ext-install pdo_mysql gettext gd opcache
 
 RUN a2enmod rewrite \
                         && cd /var/www   \

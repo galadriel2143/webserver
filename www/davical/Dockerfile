@@ -1,17 +1,16 @@
 # davical
-FROM php:5.6-fpm-alpine
+FROM php:5.6-fpm
 
 MAINTAINER Jan Losinski <losinski@wh2.tu-dresden.de>
 
 ENV DEBIAN_FRONTEND noninteractive
 
-RUN apt-get update 
-
-RUN apt-get -y install --no-install-recommends davical libcurl4-openssl-dev libpq-dev && \
+RUN apt-get update && \
+    apt-get -y install --no-install-recommends davical libcurl4-openssl-dev libpq-dev && \
 	apt-get clean && \
 	rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
-RUN docker-php-ext-install -j$(nproc) curl pdo_pgsql
+RUN docker-php-ext-install -j$(nproc) curl pdo_pgsql opcache
 
 COPY davical.conf /etc/apache2/sites-available/davical.conf
 COPY example-config.php /etc/davical/config_real.php

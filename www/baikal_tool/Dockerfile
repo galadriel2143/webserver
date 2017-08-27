@@ -1,9 +1,9 @@
-FROM node:8.0
+FROM node:8.0-alpine
 
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends mysql-client && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache python mysql-client curl
+
+RUN curl -Ls https://github.com/fgrehm/docker-phantomjs2/releases/download/v2.0.0-20150722/dockerized-phantomjs.tar.gz \
+   | tar xz -C /
 
 RUN mkdir /app
 

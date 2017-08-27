@@ -8,15 +8,23 @@ ARG RC_VERSION=1.3-beta
 
 RUN mkdir -p /var/www/roundcube && chown -R www-data:www-data /var/www/roundcube
 
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends git libz-dev libmemcached-dev mysql-client unzip "libldap-.*" libpng-dev \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+RUN apk --no-cache add \
+    tar \
+    zlib \
+    zlib-dev \
+    openldap-dev \
+    openldap \
+    pcre-dev \
+    libmemcached-dev \
+    libpng-dev \
+    mysql-client \
+    unzip
 
-RUN pecl install memcached
+RUN docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) ldap pdo_mysql gd opcache
 
-RUN docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ && \
-    docker-php-ext-install -j$(nproc) pdo_mysql gd ldap
+RUN apk --no-cache add build-base autoconf && \
+    pecl install memcached && \
+    apk del build-base autoconf
 
 # Get Roundcube package
 USER www-data
@@ -70,11 +78,14 @@ RUN \
 RUN sed -i 's/get_input_value/rcube_utils::&/g' plugins/duo_auth/duo_auth.php && \
     sed -i 's/RCUBE_INPUT_POST/rcube_utils::INPUT_POST/g' plugins/duo_auth/duo_auth.php
 
-USER www-data
+USER root
+
 RUN \
     echo "Add Awesome's plugin ===============>>>>>>>>>>>>>" && \
       cd plugins && \
+      apk add --no-cache git && \
       git clone -v https://gitlab.awesome-it.de/filhocf/roundcube-plugins.git && \
+      apk del git && \
       ln -s roundcube-plugins/plugins/calendar && \
       ln -s roundcube-plugins/plugins/libcalendaring && \
       ln -s roundcube-plugins/plugins/piwik_analytics && \
@@ -84,12 +95,10 @@ RUN \
     chown www-data.www-data /var/www/roundcube -R
 
 # Install the Composer - package manager for PHP
-USER root
-
 WORKDIR /usr/local/bin
 RUN curl -L https://getcomposer.org/download/1.4.0/composer.phar > /usr/bin/composer && \
     chmod +x /usr/bin/composer && \
-    echo 'TLS_REQCERT never' >> /etc/ldap/ldap.conf
+    echo 'TLS_REQCERT never' >> /etc/openldap/ldap.conf
 
 USER www-data
 WORKDIR /var/www/roundcube
@@ -110,8 +119,6 @@ RUN composer require --no-suggest roundcube/carddav:2.* && composer install --no
 
 USER root
 
-RUN apt-get remove -y git && apt-get autoremove -y && apt-get clean
-
 COPY config.inc.php /var/www/roundcube/config/config.inc.php
 COPY plugins /var/www/roundcube/plugins
 COPY log_errors.conf /usr/local/etc/php-fpm.d/log_errors.conf
@@ -121,7 +128,7 @@ RUN ln -s /dev/stdout /var/www/roundcube/logs/errors
 COPY run.sh /run.sh
 RUN chmod a+x /run.sh
 
-RUN echo "extension = memcached.so" > /usr/local/etc/php/conf.d/memcached.ini
+RUN docker-php-ext-enable memcached
 
 VOLUME /var/www/roundcube
 

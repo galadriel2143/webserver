@@ -1,25 +1,27 @@
 FROM php:5.6-fpm-alpine
 
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN apk add --no-cache \
 	unzip \
-	libcurl4-openssl-dev \
-	libfreetype6-dev \
-	libicu-dev \
-	libjpeg-dev \
-	libldap2-dev \
-	libmcrypt-dev \
-	libmemcached-dev \
-	libpng12-dev \
-	libpq-dev \
-	libxml2-dev \
-    mysql-client \
-	&& rm -rf /var/lib/apt/lists/* \
-    && apt-get clean
+    libpng-dev \
+    jpeg \
+    jpeg-dev \
+    icu \
+    icu-dev \
+    libpq \
+    pcre \
+    pcre-dev \
+    postgresql-dev \
+    libmemcached-dev \
+    libmemcached \
+    libmcrypt-dev \
+    libmcrypt \
+    openldap \
+    openldap-dev \
+    mysql-client
 
 # https://doc.owncloud.org/server/8.1/admin_manual/installation/source_installation.html#prerequisites
 RUN docker-php-ext-configure gd --with-png-dir=/usr --with-jpeg-dir=/usr \
-	&& docker-php-ext-configure ldap --with-libdir=lib/x86_64-linux-gnu/ \
-	&& docker-php-ext-install -j$(nproc) exif gd intl ldap mbstring mcrypt mysql opcache pdo_mysql pdo_pgsql pgsql zip
+    && docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) exif gd intl ldap mbstring mcrypt opcache pdo_mysql pdo_pgsql pgsql zip mysql
 
 # set recommended PHP.ini settings
 # see https://secure.php.net/manual/en/opcache.installation.php
@@ -34,10 +36,12 @@ RUN { \
 
 # PECL extensions
 RUN set -ex \
+    && apk add --no-cache build-base autoconf \
 	&& pecl install APCu-4.0.10 \
 	&& pecl install memcached-2.2.0 \
 	&& pecl install redis-2.2.8 \
-	&& docker-php-ext-enable apcu memcached redis
+	&& docker-php-ext-enable apcu memcached redis \
+    && apk del build-base autoconf
 
 VOLUME /var/www/html
 
