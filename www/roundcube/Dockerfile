@@ -11,20 +11,22 @@ RUN mkdir -p /var/www/roundcube && chown -R www-data:www-data /var/www/roundcube
 RUN apk --no-cache add \
     tar \
     zlib \
-    zlib-dev \
-    openldap-dev \
     openldap \
-    pcre-dev \
-    libmemcached-dev \
-    libpng-dev \
+    pcre \
+    libpng \
+    libmemcached \
+    libsasl \
+    libmemcached-libs \
     mysql-client \
     unzip
 
-RUN docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) ldap pdo_mysql gd opcache
+RUN apk --no-cache add pcre-dev openldap-dev libpng-dev && \
+    docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) ldap pdo_mysql gd opcache && \
+    apk del pcre-dev openldap-dev libpng-dev
 
-RUN apk --no-cache add build-base autoconf && \
+RUN apk add --no-cache --virtual .memcached-deps cyrus-sasl-dev build-base autoconf libmemcached-dev zlib-dev && \
     pecl install memcached && \
-    apk del build-base autoconf
+    apk del .memcached-deps
 
 # Get Roundcube package
 USER www-data
@@ -84,7 +86,7 @@ RUN \
     echo "Add Awesome's plugin ===============>>>>>>>>>>>>>" && \
       cd plugins && \
       apk add --no-cache git && \
-      git clone -v https://gitlab.awesome-it.de/filhocf/roundcube-plugins.git && \
+      git clone --depth 1 -v https://gitlab.awesome-it.de/filhocf/roundcube-plugins.git && \
       apk del git && \
       ln -s roundcube-plugins/plugins/calendar && \
       ln -s roundcube-plugins/plugins/libcalendaring && \

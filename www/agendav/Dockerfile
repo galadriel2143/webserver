@@ -10,13 +10,12 @@ RUN apk add --no-cache \
     wget \
     ca-certificates \
     libpq \
-    postgresql-dev \
-    libmcrypt-dev \
     libmcrypt \
-    curl \
-    curl-dev
+    libcurl
 
-RUN docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) pdo_pgsql mcrypt curl opcache
+RUN apk add --no-cache --virtual .agendav-ext-deps postgresql-dev libmcrypt-dev curl-dev && \
+    docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) pdo_pgsql mcrypt curl opcache && \
+    apk del .agendav-ext-deps
 
 #COPY phpinfo.php /var/www/agendav/web/public/phpinfo.php
 
