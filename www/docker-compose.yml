@@ -101,7 +101,7 @@ services:
             options:
                 max-size: 10m
     memcached:
-        image: memcached
+        image: memcached:1.5-alpine
         restart: always
         env_file: /home/secrets/memcached.env
         networks:
@@ -113,7 +113,7 @@ services:
             options:
                 max-size: 10m
     psql:
-        image: postgres:9.6
+        image: postgres:9.6-alpine
         restart: always
         ports: 
             - "192.168.255.128:5432:5432"
@@ -225,7 +225,7 @@ services:
         #extra_hosts:
         #    - "mail.msgor.com:$localhost"
     nginx:
-        image: nginx:stable
+        image: nginx:stable-alpine
         restart: always
         env_file: /home/secrets/nginx.env
         volumes_from:
