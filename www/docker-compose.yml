@@ -57,9 +57,9 @@ services:
             context: ./ampache
         volumes:
             - /home/ownclouddata/data/widget/files/music:/media:ro
-            - /home/ampache/config:/var/www/html/config
-            - /home/ampache/themes:/var/www/html/themes
-            - /home/ampache/data:/var/data
+            - /home/ampache/config:/var/lib/ampache/config
+            - /home/ampache/themes:/var/lib/ampache/themes
+            - /home/ampache/data:/var/lib/ampache/data
         restart: always
         networks:
             main:
@@ -235,6 +235,7 @@ services:
             - agendav:ro
             - roundcube:ro
             - wordpress:ro
+            - ampacheslim:ro
         volumes:
             - /home/ownclouddata:/var/www/owncloud:ro
             - /home/nginx/etc/tempsite.conf:/etc/tempsite.conf:ro

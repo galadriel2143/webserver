@@ -32,6 +32,9 @@ server {
     ssl_certificate     /etc/letsencrypt/live/music/fullchain.pem;
     ssl_certificate_key /etc/letsencrypt/live/music/privkey.pem;
 
+    set $fpm_root /var/www/ampache;
+    root $fpm_root;
+
     include defaults.conf;
 
     server_name music.msgor.com;
@@ -40,15 +43,10 @@ server {
         rewrite ^(.*).css$ $1/default.css;
     }
 
-	location / {
-        proxy_buffering off;
-        proxy_set_header Host $host;
-        proxy_redirect off;
-        proxy_set_header X-Real-IP $remote_addr;
-        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_pass http://ampache:80/;
-        break;
-    }
+    set $p_fastcgi_pass ampache:9000;
+    include php.conf;
+
+    include static_cache.conf;
 }
 
 server {
