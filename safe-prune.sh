@@ -34,11 +34,11 @@ fi
 
 CONTAINER_COUNT="$(docker inspect $CONTAINER_IDS | jq -r '.[].State.Running | select(. == true)' | wc -l)"
 
+docker ps -a -q | xargs docker rm 
+docker images -q | xargs docker rmi
 echo $CONTAINER_COUNT
 if [ "$CONTAINER_COUNT" == 24 ] ; then
     docker volume prune
-    docker ps -a -q | xargs docker rm 
-    docker images -q | xargs docker rmi
 else
     echo "You shouldn't prune volumes if some containers are down. You could lose data!"
 fi

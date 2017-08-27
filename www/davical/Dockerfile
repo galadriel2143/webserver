@@ -1,5 +1,5 @@
 # davical
-FROM php:5-fpm
+FROM php:5.6-fpm-alpine
 
 MAINTAINER Jan Losinski <losinski@wh2.tu-dresden.de>
 

@@ -1,5 +1,5 @@
 # agendav
-FROM php:7.1-fpm
+FROM php:7.1-fpm-alpine
 
 MAINTAINER Jan Losinski <losinski@wh2.tu-dresden.de>
 
