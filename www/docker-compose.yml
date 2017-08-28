@@ -153,6 +153,7 @@ services:
         volumes: 
             - /home/www:/var/mywww
             - /home/docker/www/nginx/etc/sites-available:/sites-available:ro
+            - /home/www-private:/home/www-private:ro
         networks:
             main:
                 aliases:

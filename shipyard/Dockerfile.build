@@ -1,7 +1,7 @@
-FROM golang:1.5
+FROM golang:1.7-alpine
 
-RUN curl -sL https://deb.nodesource.com/setup | bash -
-RUN apt-get update && apt-get install -y nodejs
+RUN apk add --no-cache nodejs git
+
 RUN npm install -g bower
 RUN go get github.com/tools/godep
 
@@ -13,3 +13,8 @@ ENV PATH $PATH:/go/bin:/usr/local/go/bin
 COPY . /go/src/github.com/shipyard/shipyard
 
 WORKDIR /go/src/github.com/shipyard/shipyard
+
+RUN apk add --no-cache make && \
+    make media && \
+    make build && \
+    apk del --no-cache make 
