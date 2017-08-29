@@ -130,14 +130,16 @@ services:
             options:
                 max-size: 10m
     mysql:
-        image: mysql
+        image: mysql/mysql-server:8.0
         restart: always
         ports:
             - "192.168.255.128:3306:3306"
             - "127.0.0.1:3306:3306"
         env_file: /home/secrets/mysql.env
         volumes:
-            - /home/mysql/data:/var/lib/mysql
+            - /home/mysql/data:/var/lib/mysql:rw
+            - /home/docker/www/mysql/my.cnf.d:/etc/my.cnf.d:ro
+            - /home/docker/www/mysql/my.cnf:/etc/my.cnf:ro
         networks:
             main:
                 aliases:
