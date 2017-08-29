@@ -6,6 +6,7 @@ networks:
 services:
     rethinkdb:
         image: rethinkdb
+        restart: always
         ports:
             - "8080"
             - "28015"
@@ -22,6 +23,7 @@ services:
 
     proxy:
         image: ehazlett/docker-proxy:latest
+        restart: always
         command: -i
         volumes:
             - "/var/run/docker.sock:/var/run/docker.sock"
@@ -37,6 +39,7 @@ services:
 
     swarm:
         image: swarm:latest
+        restart: always
         command: m --host tcp://0.0.0.0:2375 proxy:2375
         ports:
             - "2375"
@@ -49,6 +52,7 @@ services:
                 max-size: 10m
 
     media:
+        restart: always
         build:
             context: .
             dockerfile: Dockerfile.build
@@ -69,6 +73,7 @@ services:
                 max-size: 10m
 
     controller:
+        restart: always
         build:
             context: .
             dockerfile: Dockerfile.build
