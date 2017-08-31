@@ -58,30 +58,19 @@ rc-service haveged start
 # Naive disk handling because I can't be bothered.
 DISK="/dev/$(find_disks | awk '{print $1}')"
 
-fdisk "$DISK" <<EOF
-n
-p
-1
-1
-100m
-a
-1
-n
-p
-2
-
-
-t
-2
-8e
-p
-w
+sfdisk "$DISK" <<EOF
+1;+100m;L;*;;
+;;8e;;;
 EOF
 
-cryptsetup luksFormat "$DISK"
+sleep 10
+
+mdev -s
+
+cryptsetup luksFormat "$DISK"2
 
 LVM_NAME="lvmcrypt"
-LVM="/dev/mapper/lvmcrypt"
+LVM="/dev/mapper/$LVM_NAME"
 VG="vg0"
 SWAP="/dev/$VG/swap"
 ROOT="/dev/$VG/root"
@@ -89,7 +78,7 @@ cryptsetup open --type luks "$DISK"2 "$LVM_NAME"
 pvcreate "$LVM"
 vgcreate "$VG" "$LVM"
 lvcreate -L 1G "$VG" -n swap
-lvcreate -L "100%FREE" "$VG" -n root
+lvcreate -l "+100%FREE" "$VG" -n root
 lvscan
 mkfs.ext4 "$ROOT"
 mkswap "$SWAP"
@@ -127,5 +116,3 @@ umount "$MOUNT"
 swapoff -a
 vgchange -a n
 cryptsetup luksClose "$LVM_NAME"
-
-reboot
