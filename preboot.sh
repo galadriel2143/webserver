@@ -51,7 +51,7 @@ has_mounted_part() {
 }
 
 apk update
-apk add haveged lvm2 cryptsetup e2fsprogs syslinux sed
+apk add haveged lvm2 cryptsetup e2fsprogs syslinux sed sfdisk
 
 rc-service haveged start
 
