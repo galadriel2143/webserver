@@ -52,7 +52,12 @@ mkdir -p /var/cache/distfiles
 # FIXME All? Really?
 chmod a+w /var/cache/distfiles
 
-abuild-keygen -a -i
+abuild-keygen -a -i -n -q
+
+cd "$CURDIR/systempony"
+abuild -r
+
+apk add "$HOME/packages/webserver/x86_64/systempony-1.0.2-r7.apk"
 
 #TODO Automatic updates?
 
