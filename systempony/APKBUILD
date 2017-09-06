@@ -1,6 +1,6 @@
 # Maintainer: Max Shepard <widget@msgor.com>
 pkgname=systempony
-pkgver=1.0.1
+pkgver=1.0.2
 pkgrel=7
 pkgdesc="MLP character system stats"
 url="https://github.com/mbasaglia/ASCII-Pony"
@@ -11,7 +11,7 @@ depends="python3 cairo libffi libxml2 libxslt jpeg bash"
 makedepends="cairo-dev libffi-dev python3-dev libxml2-dev libxslt-dev jpeg-dev"
 replaces=""
 
-_commithash="588b002cb8d6d9bb4f96714f53616fef7ac436a8"
+_commithash="b127a07a2b24769f94e7eaab08af9d8c0304c1de"
 _projectname="ASCII-Pony"
 _patsi_commithash="579eae9135aae76980c10beb07fde140a8572846"
 _patsi_projectname="Python-Ansi-Terminal-Styling-Interface"
@@ -37,6 +37,6 @@ package() {
 	PREFIX="$pkgdir/usr" make install
 }
 
-sha512sums="7a10b9d90699ffd0abdae6f798a5630080f37f9f3afacf054e48e69a7f272573b0597b751e3a791337cc77f98eac4790c1474d8cd6e26d4a7834d3dfe688aaf9  systempony.1.0.1.zip
+sha512sums="afc2c88099500974074a5bd5c11cba394c79f85c706dbed65cb17fce87ca6e2832cb2a70713236d4bfc6da2d9ea04681c933efbf5e0ad0a9807f2417efc72288  systempony.1.0.2.zip
 4f997ec031346cceaea965eca26e205ea2044da0d101192aefa0f96cd1d0066fe85ae5b06bbe3b866aa91ca97e7a86e66052e26b1ad08675125d13d9692f2606  patsi.579eae9135aae76980c10beb07fde140a8572846.zip
 3b1ee157dfec375f7752885884f299c7770eec4db53d7b322eff9e82a8134af998b32eb9c966e9b04f1553f1b6d3a1a46900c451fddaf5c0b9455c8897c07498  setup-env.sh"
