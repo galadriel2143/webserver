@@ -1,0 +1,42 @@
+# Maintainer: Max Shepard <widget@msgor.com>
+pkgname=systempony
+pkgver=1.0.0
+pkgrel=7
+pkgdesc="MLP character system stats"
+url="https://github.com/mbasaglia/ASCII-Pony"
+arch="all"
+license="GPL"
+install=""
+depends="python3 cairo libffi libxml2 libxslt jpeg bash"
+makedepends="cairo-dev libffi-dev python3-dev libxml2-dev libxslt-dev jpeg-dev"
+replaces=""
+
+_commithash="b5fc742d3f7ecda86d5728792e498a3ed9f53a05"
+_projectname="ASCII-Pony"
+_patsi_commithash="579eae9135aae76980c10beb07fde140a8572846"
+_patsi_projectname="Python-Ansi-Terminal-Styling-Interface"
+source="systempony.1.0.0.zip::https://github.com/mbasaglia/$_projectname/archive/$_commithash.zip
+patsi.$_patsi_commithash.zip::https://github.com/mbasaglia/$_patsi_projectname/archive/$_patsi_commithash.zip
+setup-env.sh
+"
+options=""
+builddir="$srcdir/$_projectname-$_commithash"
+
+build() {
+	cd "$builddir"
+	rm -r patsi
+	ln -s ../$_patsi_projectname-$_patsi_commithash patsi
+	cp "$srcdir/setup-env.sh" "$builddir/patsi"
+
+	find "$srcdir" -iname '*.sh' -exec sed -i 's@^#![[:space:]]*/bin/bash@#! /bin/sh@g' '{}' \;
+	make
+}
+
+package() {
+	cd "$builddir"
+	PREFIX="$pkgdir/usr" make install
+}
+
+sha512sums="d17f3f0f5b28652afc24ce5e860843a9bb4c3a96c48d27818b5b9d248525b1ae9954d16b06f30a2a53ec6425368e740ee0b80d63c99321d6395e0976a3e6d234  systempony.1.0.0.zip
+4f997ec031346cceaea965eca26e205ea2044da0d101192aefa0f96cd1d0066fe85ae5b06bbe3b866aa91ca97e7a86e66052e26b1ad08675125d13d9692f2606  patsi.579eae9135aae76980c10beb07fde140a8572846.zip
+3b1ee157dfec375f7752885884f299c7770eec4db53d7b322eff9e82a8134af998b32eb9c966e9b04f1553f1b6d3a1a46900c451fddaf5c0b9455c8897c07498  setup-env.sh"

@@ -31,13 +31,33 @@ if [ "$1" = "everything" ] ; then
     rm -f /home/ownclouddata/version.php
 fi
 
-apk update
-apk add docker sudo shadow neovim git
+setup-alpine
+
+setup-apkrepos -f
+
+sed -i 's/^#\(.*\)3\.\([0-9]\)/\13.\2/g' "/etc/apk/repositories"
+
+# Install
+apk update && \
+	apk add docker sudo shadow neovim git curl py2-pip python3 nodejs-current fail2ban w3m py-virtualenv cadaver nmap graphviz expect supervisor tmux htop mysql-client postgresql-client ca-certificates pwgen ipcalc duo_unix acl jq imagemagick sqlite3 py-eyed3 rsync alpine-sdk && \
+	pip3 install linode-cli || exit $?
 
 addgroup sudo
+
+rsync -rav "$CURDIR/etc/." "/etc/."
+
+# APKBUILD
+mkdir -p /var/cache/distfiles
+
+# FIXME All? Really?
+chmod a+w /var/cache/distfiles
+
+abuild-keygen -a -i
+
+#TODO Automatic updates?
 
 # This should be near the end
 adduser widget
 
-usermod -a -G sudo widget
-
+addgroup widget sudo
+addgroup widget abuild
