@@ -14,3 +14,5 @@ rc-service haveged start
 
 "$CURDIR/setup-partitions"
 "$CURDIR/setup-disk" -m sys -E
+
+cp -r "$CURDIR" /mnt/home/webserver
