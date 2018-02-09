@@ -1,0 +1,4 @@
+#! /usr/bin/env expect
+eval spawn -noecho $argv
+set timeout -1
+expect

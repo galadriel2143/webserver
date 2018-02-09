@@ -1,0 +1,82 @@
+#!/bin/bash
+
+set -e
+
+if [ -e /etc/davical/servername ]; then
+	DAVICAL_SERVER_NAME=$(cat /etc/davical/servername)
+else
+	DAVICAL_SERVER_NAME=${DAVICAL_SERVER_NAME:=example.com}
+	echo ${DAVICAL_SERVER_NAME} > /etc/davical/servername
+fi
+
+APACHE_SERVERNAME=${DAVICAL_SERVER_NAME}
+
+export DAVICAL_SERVER_NAME=${DAVICAL_SERVER_NAME}
+export APACHE_SERVERNAME=${APACHE_SERVERNAME}
+
+if [ ! -e /etc/davical/administration.yml ]; then
+
+if [ "x" != "x${DAVICAL_DB_ADMIN_PASS}" -a "x" != "x${DAVICAL_DB_ADMIN}" ]; then
+cat <<EOF > /etc/davical/administration.yml
+#
+# Administration Configuration file (sample)
+#
+#  This file is only used by command-line programs accessing the DAViCal
+#  database for maintenance.  It should be as secure as you can make it
+#  since it contains passwords and connection details for a more powerful
+#  database connection.  Mode 600 is recommended.
+#
+#  This file should be called 'administration.yml' in the config directory.
+#
+
+##
+## The database username for connecting with sufficient rights to create
+## tables, functions and granting access to other users.
+admin_db_user: ${DAVICAL_DB_ADMIN}
+
+##
+## The password.  Leading and trailling spaces are stripped, so don't do that
+admin_db_pass: ${DAVICAL_DB_ADMIN_PASS}
+
+##
+## The hostname/IP.  Not needed if using unix sockets to a local server.
+#admin_db_host: 2401:170:20:17::1024:0
+admin_db_host: postgres
+
+##
+## The database name
+admin_db_name: ${DAVICAL_DB_NAME}
+
+##
+## The database port.  Not needed if it is the default '5432'
+#admin_db_port: 5432
+
+
+##
+## The name of the database user the web application uses to connect
+app_db_user: ${DAVICAL_DB_USER}
+EOF
+fi
+fi
+
+if [ ! -e /etc/davical/config.php ]; then
+cat <<EOF > /etc/davical/config.php
+<?php
+
+# GENERATED!
+
+\$container_db_name="${DAVICAL_DB_NAME}";
+\$container_db_user="${DAVICAL_DB_USER}";
+\$container_db_host="postgres";
+\$container_db_password="${DAVICAL_DB_PASS}";
+
+include('config_real.php');
+EOF
+fi
+
+if [ "x$1" = 'xapache2' ]; then
+	echo "Start webserver"
+	exec /usr/sbin/apache2ctl -D FOREGROUND
+else
+	exec "$@"
+fi

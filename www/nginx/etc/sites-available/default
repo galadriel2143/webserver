@@ -1,0 +1,202 @@
+#upstream mozserver {
+#    server unix:/var/run/mozsync/mozsync.sock fail_timeout=0;
+#    server localhost:5000;
+#}
+
+server {
+    listen 80 default_server;
+
+    include letsencrypt.conf;
+
+    location / {
+        return 301 https:$host$request_uri;
+    }
+}
+
+server {
+    ssl_certificate     /etc/letsencrypt/live/www/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/www/privkey.pem;
+
+    set $fpm_root /var/www/html;
+    root $fpm_root;
+
+    include defaults.conf;
+
+    server_name msgor.com;
+
+    set $p_fastcgi_pass wordpress:9000;
+    include php.conf;
+}
+
+server {
+    ssl_certificate     /etc/letsencrypt/live/music/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/music/privkey.pem;
+
+    set $fpm_root /var/www/ampache;
+    root $fpm_root;
+
+    include defaults.conf;
+
+    server_name music.msgor.com;
+
+    location = /themes/reborn/templates/.css {
+        rewrite ^(.*).css$ $1/default.css;
+    }
+
+    set $p_fastcgi_pass ampache:9000;
+    include php.conf;
+
+    include static_cache.conf;
+}
+
+server {
+    ssl_certificate     /etc/letsencrypt/live/torrent/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/torrent/privkey.pem;
+
+    include defaults.conf;
+
+    server_name torrent.msgor.com;
+
+	location / {
+        proxy_buffering off;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://msgor.com:8112/;
+        break;
+    }
+}
+
+server {
+    ssl_certificate     /etc/letsencrypt/live/shipyard/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/shipyard/privkey.pem;
+
+    include defaults.conf;
+
+    server_name shipyard.msgor.com;
+
+	location / {
+        proxy_buffering off;
+        proxy_set_header Host $host;
+        proxy_redirect off;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://shipyard:8080/;
+        break;
+    }
+}
+
+server {
+    ssl_certificate     /etc/letsencrypt/live/stats/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/stats/privkey.pem;
+
+    include defaults.conf;
+
+    server_name stats.msgor.com;
+
+	location / {
+        auth_basic "CAdvisor";
+        auth_basic_user_file .htpasswd;
+
+        proxy_set_header Host $host;
+        proxy_redirect off;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_pass http://cadvisor:8080/;
+        break;
+    }
+}
+
+server {
+    ssl_certificate     /etc/letsencrypt/live/cloud/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cloud/privkey.pem;
+
+    set $fpm_root /var/www/html;
+    root /var/www/owncloud;
+
+    include defaults.conf;
+
+    server_name cloud.msgor.com;
+
+    location /data {
+        deny all;
+    }
+
+    location /config {
+        deny all;
+    }
+
+    set $p_fastcgi_pass owncloud:9000;
+    include php.conf;
+
+    include static_cache.conf;
+}
+
+server {
+    ssl_certificate     /etc/letsencrypt/live/cal/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cal/privkey.pem;
+
+    set $fpm_root /var/www/agendav/web/public;
+    root $fpm_root;
+
+    include defaults.conf;
+    include static_cache.conf;
+
+    server_name "cal.msgor.com";
+
+    set $p_fastcgi_pass agendav:9000;
+    include php.conf;
+
+    location ~ "(?!(\.php|\.{3,4}$))" {
+        rewrite ^(.*)$ /index.php/$1;
+    }
+}
+
+server {
+    ssl_certificate     /etc/letsencrypt/live/cube/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/cube/privkey.pem;
+
+    set $fpm_root /var/www/roundcube;
+    root $fpm_root;
+
+    include defaults.conf;
+    include static_cache.conf;
+
+    server_name "cube.msgor.com";
+
+    location /temp {
+        deny all;
+    }
+
+    location /logs {
+        deny all;
+    }
+
+    location /config {
+        deny all;
+    }
+
+    set $p_fastcgi_pass roundcube:9000;
+    include php.conf;
+
+    #location ~ "(?!(\.php|\.{3,4}$))" {
+    #    rewrite ^(.*)$ /index.php/$1;
+    #}
+}
+
+server {
+    ssl_certificate     /etc/letsencrypt/live/dav/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/dav/privkey.pem;
+
+    set $fpm_root /var/www/calendar_server/html;
+    root $fpm_root;
+
+    include defaults.conf;
+    include static_cache.conf;
+
+    server_name "dav.msgor.com";
+
+    set $p_fastcgi_pass baikal:9000;
+    include php.conf;
+}

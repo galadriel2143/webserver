@@ -1,0 +1,13 @@
+[Unit]
+Description=docker-compose mail container
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/docker-compose -f /home/docker/mail/docker-compose.yml up
+KillMode=process
+Environment="DOMAIN_NAME=msgor.com"
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,20 @@
+#!/bin/sh
+
+set -e
+
+until PGPASSWORD="${AGENDAV_DB_PASSWORD}" psql -h postgres "${AGENDAV_DB_NAME}" "${AGENDAV_DB_USER}" ; do
+    echo "AgenDAV is waiting for postgres..."
+    sleep 1
+done
+
+CURDIR="$PWD"
+cd /var/www/agendav
+php ./agendavcli migrations:migrate --no-interaction
+cd "$CURDIR"
+
+if [ "x$1" = 'xapache2' ]; then
+	echo "Start webserver"
+	exec /usr/sbin/apache2ctl -D FOREGROUND
+else
+	exec "$@"
+fi

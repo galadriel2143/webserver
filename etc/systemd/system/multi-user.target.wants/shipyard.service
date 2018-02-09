@@ -1,0 +1,13 @@
+[Unit]
+Description=shipyard container management
+After=docker-compose.service
+Requires=docker-compose.service
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/docker-compose -f /home/docker/shipyard/docker-compose.yml up
+KillMode=process
+Environment="DOMAIN_NAME=msgor.com"
+
+[Install]
+WantedBy=multi-user.target

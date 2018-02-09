@@ -1,0 +1,300 @@
+version: '2'
+networks:
+    main:
+        ipam:
+            config:
+                - subnet: 172.18.0.0/16
+    mail_main:
+        external: true
+    vpn_main:
+        external: true
+services:
+    # Putting this here is weird.
+    dns:
+        image: andyshinn/dnsmasq:2.75
+        volumes:
+            - /home/openvpn/etc/dnsmasq.conf:/etc/dnsmasq.conf
+        ports:
+            - "192.168.255.128:53:53/tcp"
+            - "192.168.255.128:53:53/udp"
+        cap_add:
+            - NET_ADMIN
+        restart: always
+        networks:
+            vpn_main:
+                aliases:
+                    - dns
+            main:
+                aliases:
+                    - dns
+
+    deluge:
+        # This is also weird. Maybe dangerous.
+        network_mode: host
+
+        image: linuxserver/deluge:74
+        environment:
+            PUID: www-data
+            PGID: www-data
+            TZ: America/New_York
+        volumes: 
+            - /home/deluge/downloads:/downloads
+            - /home/deluge/config:/config
+
+    wordpress:
+        image: wordpress:4-php7.1-fpm
+        restart: always
+        env_file: /home/secrets/wordpress.env
+        depends_on:
+            - mysql
+        networks:
+            main:
+                aliases:
+                    - wordpress
+        logging:
+            options:
+                max-size: 10m
+
+    ampacheslim:
+        build:
+            context: ./ampache
+        volumes:
+            - /home/ownclouddata/data/widget/files/music:/media:ro
+            - /home/ampache/config:/var/lib/ampache/config
+            - /home/ampache/themes:/var/lib/ampache/themes
+            - /home/ampache/data:/var/lib/ampache/data
+        restart: always
+        networks:
+            main:
+                aliases:
+                    - ampacheslim
+                    - ampache
+        logging:
+            options:
+                max-size: 10m
+    cadvisor:
+        image: google/cadvisor:v0.25.0
+        restart: always
+        volumes:
+            - /:/rootfs:ro
+            - /var/run:/var/run:rw
+            - /sys:/sys:ro
+            - /var/lib/docker/:/var/lib/docker:ro
+        networks:
+            main:
+                aliases:
+                    - cadvisor
+        logging:
+            options:
+                max-size: 10m
+    owncloud:
+        build:
+            context: ./owncloud
+        env_file: /home/secrets/owncloud.env
+        volumes:
+            - /home/ownclouddata:/var/www/html
+        restart: always
+        depends_on:
+            - mysql
+        networks:
+            main:
+                aliases:
+                    - owncloud
+        logging:
+            options:
+                max-size: 10m
+    memcached:
+        image: memcached:1.5-alpine
+        restart: always
+        env_file: /home/secrets/memcached.env
+        networks:
+            main:
+                aliases:
+                    - memcache
+                    - memcached
+        logging:
+            options:
+                max-size: 10m
+    psql:
+        image: postgres:9.6-alpine
+        restart: always
+        ports: 
+            - "192.168.255.128:5432:5432"
+            - "127.0.0.1:5432:5432"
+        env_file: /home/secrets/psql.env
+        volumes:
+            - /home/psql/data:/var/lib/postgresql/data
+        networks:
+            main:
+                aliases:
+                    - postgres
+                    - psql
+        logging:
+            options:
+                max-size: 10m
+    mysql:
+        image: mysql/mysql-server:8.0
+        restart: always
+        ports:
+            - "192.168.255.128:3306:3306"
+            - "127.0.0.1:3306:3306"
+        env_file: /home/secrets/mysql.env
+        volumes:
+            - /home/mysql/data:/var/lib/mysql:rw
+            - /home/docker/www/mysql/my.cnf.d:/etc/my.cnf.d:ro
+            - /home/docker/www/mysql/my.cnf:/etc/my.cnf:ro
+        networks:
+            main:
+                aliases:
+                    - mysql
+        logging:
+            options:
+                max-size: 10m
+    fpm:
+        build: 
+            context: ./fpm
+        restart: always
+        env_file: /home/secrets/fpm.env
+        volumes: 
+            - /home/www:/var/mywww
+            - /home/docker/www/nginx/etc/sites-available:/sites-available:ro
+            - /home/www-private:/home/www-private:ro
+        networks:
+            main:
+                aliases:
+                    - fpm
+        logging:
+            options:
+                max-size: 10m
+    agendav:
+        build:
+            context: ./agendav
+        restart: always
+        env_file: /home/secrets/agendav.env
+        networks:
+            - main
+        depends_on:
+            - psql
+        networks:
+            main:
+                aliases:
+                    - agendav
+        logging:
+            options:
+                max-size: 10m
+    baikal:
+        build:
+            context: ./baikal
+        restart: always
+        env_file: /home/secrets/baikal.env
+        depends_on:
+            - mysql
+        networks:
+            main:
+                aliases:
+                    - baikal
+        logging:
+            options:
+                max-size: 10m
+    baikal_tool:
+        build:
+            context: ./baikal_tool
+        env_file: /home/secrets/baikal.env
+        depends_on:
+            - nginx
+            - baikal
+        networks:
+            main:
+                aliases:
+                    - baikal_tool
+        logging:
+            options:
+                max-size: 10m
+    roundcube:
+        build:
+            context: ./roundcube
+        restart: always
+        env_file: /home/secrets/roundcube.env
+        depends_on:
+            #- memcached
+            - mysql
+        networks:
+            mail_main:
+                aliases:
+                    - roundcube
+            main:
+                aliases:
+                    - roundcube
+        logging:
+            options:
+                max-size: 10m
+        #extra_hosts:
+        #    - "mail.msgor.com:$localhost"
+    nginx:
+        build:
+            context: ./nginx/build
+        restart: always
+        env_file: /home/secrets/nginx.env
+        volumes_from:
+            - fpm:ro
+            - baikal:ro
+            - agendav:ro
+            - roundcube:ro
+            - wordpress:ro
+            - ampacheslim:ro
+        volumes:
+            - /home/ownclouddata:/var/www/owncloud:ro
+            - /home/nginx/etc/tempsite.conf:/etc/tempsite.conf:ro
+            - /var/www/letsencrypt:/var/www/letsencrypt:ro
+            - /home/docker/www/nginx/etc:/etc/nginx:ro
+            - /home/letsencrypt/etc:/etc/letsencrypt:ro
+        ports:
+            - "80:80"
+            - "443:443"
+        networks:
+            main:
+                aliases:
+                    - nginx
+                    - dav.$DOMAIN_NAME
+                    - cal.$DOMAIN_NAME
+                    - cloud.$DOMAIN_NAME
+        logging:
+            options:
+                max-size: 10m
+
+    certbot:
+        image: certbot/certbot:v0.15.0
+        volumes:
+            - /home/letsencrypt/etc:/etc/letsencrypt
+        entrypoint:
+            - certbot
+        networks:
+            main:
+                ipv4_address: 172.18.128.1
+                aliases:
+                    - certbot
+
+    # Random stuff not included in webserver repo.
+
+    lockpush:
+        build:
+            context: /home/widget/lockpush
+        depends_on:
+            - mysql
+        networks:
+            main:
+                aliases:
+                    - lockpush
+        logging:
+            options:
+                max-size: 10m
+
+    corgibot:
+        build:
+            context: /home/widget/corgibot
+        volumes:
+            - /home/corgibot/config:/app/config:rw
+        # Container has no networks to prevent access from others.
+        logging:
+            options:
+                max-size: 10m

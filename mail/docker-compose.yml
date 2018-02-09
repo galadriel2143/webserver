@@ -1,0 +1,39 @@
+version: '2'
+networks:
+    main:
+services:
+    solr:
+        build:
+            context: ./solr
+        ports: 
+            - "127.0.0.1:8983:8983"
+        container_name: solr
+        restart: always
+        networks:
+            main:
+                aliases:
+                    - solr
+    mail:
+        build:
+            context: ./build
+        hostname: mail
+        domainname: $DOMAIN_NAME
+        container_name: mail
+        restart: always
+        ports:
+            - "25:25"
+            - "587:587"
+            - "993:993"
+            - "4190:4190"
+        volumes:
+            - /home/mail/data:/var/mail
+            - /home/mail/state:/var/mail-state
+            - /home/mail/etc:/tmp/docker-mailserver
+            - /home/letsencrypt/etc:/etc/letsencrypt:ro
+        env_file: /home/secrets/mail.env
+        cap_add:
+            - NET_ADMIN
+        networks:
+            main:
+                aliases:
+                    - mail.$DOMAIN_NAME

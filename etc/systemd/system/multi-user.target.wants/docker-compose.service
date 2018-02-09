@@ -1,0 +1,13 @@
+[Unit]
+Description=primary docker-compose container
+After=dockermailer.service dockervpn.service openvpn.service
+Requires=dockermailer.service dockervpn.service openvpn.service
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/docker-compose -f /home/docker/www/docker-compose.yml up
+KillMode=process
+Environment="DOMAIN_NAME=msgor.com"
+
+[Install]
+WantedBy=multi-user.target
